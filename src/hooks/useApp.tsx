@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Child, Sighting, PaymentRecord, AnimalType, ANIMAL_VALUES } from '../models/types';
 import * as db from '../services/db';
+import { getCurrentLocation } from '../services/geolocation';
 
 interface AppContextType {
   children: Child[];
@@ -84,6 +85,9 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
       return [];
     }
 
+    // Try to get location (non-blocking)
+    const location = await getCurrentLocation();
+
     const newSightings: Sighting[] = activeChildren.map(child => ({
       id: crypto.randomUUID(),
       timestamp: Date.now(),
@@ -92,6 +96,7 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
       childIds: [child.id],
       childNamesSnapshot: [child.name],
       paid: false,
+      ...(location && { location }), // Only add if available
     }));
 
     await db.saveSightings(newSightings);

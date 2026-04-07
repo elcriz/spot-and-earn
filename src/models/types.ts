@@ -14,6 +14,11 @@ export type Sighting = {
   childIds: string[];
   childNamesSnapshot: string[];
   paid: boolean;
+  location?: {
+    latitude: number;
+    longitude: number;
+    accuracy?: number;
+  };
 };
 
 export type PaymentRecord = {

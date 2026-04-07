@@ -20,8 +20,10 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PaymentIcon from '@mui/icons-material/Payment';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { useApp } from '../hooks/useApp';
 import { ANIMAL_EMOJIS, ANIMAL_LABELS, Sighting, HistoryEntry } from '../models/types';
+import { getMapUrl } from '../services/geolocation';
 
 export default function HistoryPage() {
   const { sightings, paymentRecords, deleteSighting, loading } = useApp();
@@ -169,6 +171,18 @@ export default function HistoryPage() {
                             <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
                               {ANIMAL_LABELS[entry.data.animal]}
                             </Typography>
+                            {entry.data.location && (
+                              <IconButton
+                                size="small"
+                                href={getMapUrl(entry.data.location.latitude, entry.data.location.longitude)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title="View on map"
+                                sx={{ ml: 0.5 }}
+                              >
+                                <LocationOnIcon fontSize="small" color="primary" />
+                              </IconButton>
+                            )}
                           </Box>
 
                           <Typography
