@@ -65,12 +65,13 @@ export default function HomePage() {
             sx={{
               fontSize: '1.5rem',
               py: 3,
+              justifyContent: 'flex-start',
               background: hasActiveChildren
                 ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                 : undefined,
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 2 }}>
               <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.deer}</span>
               <Box sx={{ textAlign: 'left' }}>
                 <Typography variant="h5" component="div">
@@ -92,12 +93,13 @@ export default function HomePage() {
             sx={{
               fontSize: '1.5rem',
               py: 3,
+              justifyContent: 'flex-start',
               background: hasActiveChildren
                 ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
                 : undefined,
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 2 }}>
               <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.hare}</span>
               <Box sx={{ textAlign: 'left' }}>
                 <Typography variant="h5" component="div">
