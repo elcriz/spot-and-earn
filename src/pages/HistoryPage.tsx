@@ -10,6 +10,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  Divider,
   IconButton,
   List,
   ListItem,
@@ -18,18 +19,23 @@ import {
   Typography,
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import PaymentIcon from '@mui/icons-material/Payment';
 import { useApp } from '../hooks/useApp';
-import { ANIMAL_EMOJIS, ANIMAL_LABELS, Sighting } from '../models/types';
+import { ANIMAL_EMOJIS, ANIMAL_LABELS, Sighting, HistoryEntry } from '../models/types';
 
 export default function HistoryPage() {
-  const { sightings, deleteSighting, loading } = useApp();
+  const { sightings, paymentRecords, deleteSighting, loading } = useApp();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [sightingToDelete, setSightingToDelete] = useState<Sighting | null>(null);
 
-  // Sort sightings by timestamp, most recent first
-  const sortedSightings = useMemo(() => {
-    return [...sightings].sort((a, b) => b.timestamp - a.timestamp);
-  }, [sightings]);
+  // Merge and sort all history entries by timestamp, most recent first
+  const sortedHistory = useMemo(() => {
+    const entries: HistoryEntry[] = [
+      ...sightings.map(s => ({ type: 'sighting' as const, data: s })),
+      ...paymentRecords.map(p => ({ type: 'payment' as const, data: p })),
+    ];
+    return entries.sort((a, b) => b.data.timestamp - a.data.timestamp);
+  }, [sightings, paymentRecords]);
 
   const formatTimestamp = (timestamp: number): string => {
     const date = new Date(timestamp);
@@ -98,116 +104,193 @@ export default function HistoryPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
       <Stack spacing={3}>
-        <Typography variant="h5" align="center">Sighting History</Typography>
+        <Typography variant="h5" align="center">History</Typography>
 
-        {sortedSightings.length > 0 && (
-          <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50' }}>
-            <Typography variant="body2" color="text.secondary" align="center">
-              {sortedSightings.length} total sighting{sortedSightings.length !== 1 ? 's' : ''}
-            </Typography>
-          </Paper>
-        )}
-
-        {sortedSightings.length === 0 ? (
+        {sortedHistory.length === 0 ? (
           <Paper elevation={2} sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
-              No sightings yet
+              No history yet
             </Typography>
             <Typography variant="body2" color="text.secondary">
               Start spotting animals to build your history!
             </Typography>
           </Paper>
         ) : (
-          <Paper elevation={2}>
-            <List>
-              {sortedSightings.map((sighting, index) => (
-                <ListItem
-                  key={sighting.id}
-                  sx={{
-                    borderBottom: index < sortedSightings.length - 1 ? '1px solid' : 'none',
-                    borderColor: 'divider',
-                    py: 2,
-                    flexDirection: 'column',
-                    alignItems: 'flex-start',
-                    position: 'relative',
-                  }}
-                >
-                  <IconButton
-                    aria-label="delete"
-                    size="small"
-                    onClick={() => handleDeleteClick(sighting)}
-                    sx={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8,
-                      color: 'error.main',
-                    }}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
+          <>
+            <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50' }}>
+              <Typography variant="body2" color="text.secondary" align="center">
+                {sortedHistory.length} total {sortedHistory.length !== 1 ? 'entries' : 'entry'}
+              </Typography>
+            </Paper>
 
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                      mb: 1,
-                      pr: 5, // Make room for delete button
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      <Typography variant="h6" component="span">
-                        {ANIMAL_EMOJIS[sighting.animal]}
-                      </Typography>
-                      <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
-                        {ANIMAL_LABELS[sighting.animal]}
-                      </Typography>
-                    </Box>
-
-                    <Typography
-                      variant="h6"
-                      color={sighting.paid ? 'text.secondary' : 'primary'}
-                      sx={{ fontWeight: 'bold' }}
-                    >
-                      €{sighting.value.toFixed(2)}
-                    </Typography>
-                  </Box>
-
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      width: '100%',
-                      alignItems: 'center',
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-                      {sighting.childNamesSnapshot.map((name, idx) => (
-                        <Chip
-                          key={idx}
-                          label={name}
+            <Paper elevation={2}>
+              <List>
+                {sortedHistory.map((entry, index) => (
+                  <Box key={entry.type === 'sighting' ? entry.data.id : entry.data.id}>
+                    {entry.type === 'sighting' ? (
+                      // Sighting Entry
+                      <ListItem
+                        sx={{
+                          borderBottom: index < sortedHistory.length - 1 ? '1px solid' : 'none',
+                          borderColor: 'divider',
+                          py: 2,
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          position: 'relative',
+                        }}
+                      >
+                        <IconButton
+                          aria-label="delete"
                           size="small"
-                          variant="outlined"
-                        />
-                      ))}
-                      {sighting.paid && (
-                        <Chip
-                          label="Paid"
-                          size="small"
-                          color="success"
-                          variant="filled"
-                        />
-                      )}
-                    </Box>
+                          onClick={() => handleDeleteClick(entry.data)}
+                          sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            color: 'error.main',
+                          }}
+                        >
+                          <DeleteIcon fontSize="small" />
+                        </IconButton>
 
-                    <Typography variant="caption" color="text.secondary">
-                      {formatTimestamp(sighting.timestamp)}
-                    </Typography>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            mb: 1,
+                            pr: 5,
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Typography variant="h6" component="span">
+                              {ANIMAL_EMOJIS[entry.data.animal]}
+                            </Typography>
+                            <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
+                              {ANIMAL_LABELS[entry.data.animal]}
+                            </Typography>
+                          </Box>
+
+                          <Typography
+                            variant="h6"
+                            color={entry.data.paid ? 'text.secondary' : 'primary'}
+                            sx={{ fontWeight: 'bold' }}
+                          >
+                            €{entry.data.value.toFixed(2)}
+                          </Typography>
+                        </Box>
+
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                            {entry.data.childNamesSnapshot.map((name, idx) => (
+                              <Chip
+                                key={idx}
+                                label={name}
+                                size="small"
+                                variant="outlined"
+                              />
+                            ))}
+                            {entry.data.paid && (
+                              <Chip
+                                label="Paid"
+                                size="small"
+                                color="success"
+                                variant="filled"
+                              />
+                            )}
+                          </Box>
+
+                          <Typography variant="caption" color="text.secondary">
+                            {formatTimestamp(entry.data.timestamp)}
+                          </Typography>
+                        </Box>
+                      </ListItem>
+                    ) : (
+                      // Payment Entry
+                      <ListItem
+                        sx={{
+                          borderBottom: index < sortedHistory.length - 1 ? '1px solid' : 'none',
+                          borderColor: 'divider',
+                          py: 2,
+                          flexDirection: 'column',
+                          alignItems: 'flex-start',
+                          bgcolor: 'success.lighter',
+                        }}
+                      >
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            mb: 1,
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <PaymentIcon color="success" />
+                            <Typography variant="body1" sx={{ fontWeight: 'bold' }} color="success.dark">
+                              Payment Made
+                            </Typography>
+                          </Box>
+
+                          <Typography
+                            variant="h6"
+                            color="success.dark"
+                            sx={{ fontWeight: 'bold' }}
+                          >
+                            €{entry.data.totalAmount.toFixed(2)}
+                          </Typography>
+                        </Box>
+
+                        <Box sx={{ width: '100%', mb: 1 }}>
+                          <Divider sx={{ my: 1 }} />
+                          {entry.data.childBalances.map((balance, idx) => (
+                            <Box
+                              key={idx}
+                              sx={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                py: 0.5,
+                              }}
+                            >
+                              <Typography variant="body2" color="text.secondary">
+                                {balance.childName}
+                              </Typography>
+                              <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'medium' }}>
+                                €{balance.amount.toFixed(2)}
+                              </Typography>
+                            </Box>
+                          ))}
+                        </Box>
+
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            width: '100%',
+                            alignItems: 'center',
+                          }}
+                        >
+                          <Typography variant="caption" color="text.secondary">
+                            {entry.data.sightingIds.length} sighting{entry.data.sightingIds.length !== 1 ? 's' : ''} paid
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            {formatTimestamp(entry.data.timestamp)}
+                          </Typography>
+                        </Box>
+                      </ListItem>
+                    )}
                   </Box>
-                </ListItem>
-              ))}
-            </List>
-          </Paper>
+                ))}
+              </List>
+            </Paper>
+          </>
         )}
       </Stack>
 

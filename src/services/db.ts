@@ -1,8 +1,8 @@
 import { openDB, IDBPDatabase } from 'idb';
-import { Child, Sighting } from '../models/types';
+import { Child, Sighting, PaymentRecord } from '../models/types';
 
 const DB_NAME = 'spot-and-earn-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 let dbInstance: IDBPDatabase | null = null;
 
@@ -12,7 +12,7 @@ export async function getDB(): Promise<IDBPDatabase> {
   }
 
   dbInstance = await openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
+    upgrade(db, oldVersion) {
       // Create children store
       if (!db.objectStoreNames.contains('children')) {
         db.createObjectStore('children', { keyPath: 'id' });
@@ -23,6 +23,12 @@ export async function getDB(): Promise<IDBPDatabase> {
         const sightingsStore = db.createObjectStore('sightings', { keyPath: 'id' });
         sightingsStore.createIndex('by-timestamp', 'timestamp');
         sightingsStore.createIndex('by-paid', 'paid');
+      }
+
+      // Create payment records store (v2+)
+      if (oldVersion < 2 && !db.objectStoreNames.contains('payments')) {
+        const paymentsStore = db.createObjectStore('payments', { keyPath: 'id' });
+        paymentsStore.createIndex('by-timestamp', 'timestamp');
       }
     },
   });
@@ -84,6 +90,22 @@ export async function getSightingsByTimestamp(): Promise<Sighting[]> {
   const db = await getDB();
   const index = db.transaction('sightings').store.index('by-timestamp');
   return index.getAll();
+}
+
+// Payment Records operations
+export async function getAllPaymentRecords(): Promise<PaymentRecord[]> {
+  const db = await getDB();
+  return db.getAll('payments');
+}
+
+export async function savePaymentRecord(payment: PaymentRecord): Promise<void> {
+  const db = await getDB();
+  await db.put('payments', payment);
+}
+
+export async function deletePaymentRecord(id: string): Promise<void> {
+  const db = await getDB();
+  await db.delete('payments', id);
 }
 
 // Initialize database with default children

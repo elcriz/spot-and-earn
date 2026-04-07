@@ -16,6 +16,22 @@ export type Sighting = {
   paid: boolean;
 };
 
+export type PaymentRecord = {
+  id: string;
+  timestamp: number;
+  totalAmount: number;
+  sightingIds: string[];
+  childBalances: Array<{
+    childId: string;
+    childName: string;
+    amount: number;
+  }>;
+};
+
+export type HistoryEntry = 
+  | { type: 'sighting'; data: Sighting }
+  | { type: 'payment'; data: PaymentRecord };
+
 export const ANIMAL_VALUES: Record<AnimalType, number> = {
   deer: 1.0,
   hare: 0.5,

@@ -1,10 +1,11 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Child, Sighting, AnimalType, ANIMAL_VALUES } from '../models/types';
+import { Child, Sighting, PaymentRecord, AnimalType, ANIMAL_VALUES } from '../models/types';
 import * as db from '../services/db';
 
 interface AppContextType {
   children: Child[];
   sightings: Sighting[];
+  paymentRecords: PaymentRecord[];
   loading: boolean;
   addChild: (name: string) => Promise<void>;
   removeChild: (id: string) => Promise<void>;
@@ -22,6 +23,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children: childrenProp }: { children: ReactNode }) {
   const [children, setChildren] = useState<Child[]>([]);
   const [sightings, setSightings] = useState<Sighting[]>([]);
+  const [paymentRecords, setPaymentRecords] = useState<PaymentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [lastSightingIds, setLastSightingIds] = useState<string[]>([]);
 
@@ -30,12 +32,14 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
     async function loadData() {
       try {
         await db.initializeDefaultData();
-        const [loadedChildren, loadedSightings] = await Promise.all([
+        const [loadedChildren, loadedSightings, loadedPayments] = await Promise.all([
           db.getAllChildren(),
           db.getAllSightings(),
+          db.getAllPaymentRecords(),
         ]);
         setChildren(loadedChildren);
         setSightings(loadedSightings);
+        setPaymentRecords(loadedPayments);
       } catch (error) {
         console.error('Failed to load data:', error);
       } finally {
@@ -114,9 +118,51 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
   };
 
   const markAllAsPaid = async () => {
+    const unpaidSightings = sightings.filter(s => !s.paid);
+    
+    if (unpaidSightings.length === 0) {
+      return;
+    }
+
+    // Calculate balances per child
+    const childBalancesMap = new Map<string, { childName: string; amount: number }>();
+    
+    unpaidSightings.forEach(sighting => {
+      sighting.childIds.forEach((childId, idx) => {
+        const childName = sighting.childNamesSnapshot[idx];
+        const existing = childBalancesMap.get(childId);
+        if (existing) {
+          existing.amount += sighting.value;
+        } else {
+          childBalancesMap.set(childId, { childName, amount: sighting.value });
+        }
+      });
+    });
+
+    // Create payment record
+    const paymentRecord: PaymentRecord = {
+      id: crypto.randomUUID(),
+      timestamp: Date.now(),
+      totalAmount: unpaidSightings.reduce((sum, s) => sum + s.value, 0),
+      sightingIds: unpaidSightings.map(s => s.id),
+      childBalances: Array.from(childBalancesMap.entries()).map(([childId, data]) => ({
+        childId,
+        childName: data.childName,
+        amount: data.amount,
+      })),
+    };
+
+    // Update sightings to paid
     const updatedSightings = sightings.map(s => ({ ...s, paid: true }));
-    await db.saveSightings(updatedSightings);
+    
+    // Save to database
+    await Promise.all([
+      db.saveSightings(updatedSightings),
+      db.savePaymentRecord(paymentRecord),
+    ]);
+    
     setSightings(updatedSightings);
+    setPaymentRecords(prev => [...prev, paymentRecord]);
     setLastSightingIds([]);
   };
 
@@ -125,6 +171,7 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
       value={{
         children,
         sightings,
+        paymentRecords,
         loading,
         addChild,
         removeChild,
