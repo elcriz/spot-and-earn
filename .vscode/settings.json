@@ -4,6 +4,11 @@
         "git remote": true,
         "git add": true,
         "git commit": true,
-        "git push": true
+        "git push": true,
+        "mkdir": true,
+        "xdg-open": true,
+        "open": true,
+        "npx pwa-asset-generator": true,
+        "npm run build": true
     }
 }

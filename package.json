@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "generate-icons": "pwa-asset-generator public/icon.svg public --icon-only --favicon --type png --background \"#1976d2\""
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -32,6 +33,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
     "gh-pages": "^6.3.0",
+    "pwa-asset-generator": "^8.1.4",
     "typescript": "^5.2.2",
     "vite": "^5.2.0",
     "vite-plugin-pwa": "^0.19.8"
