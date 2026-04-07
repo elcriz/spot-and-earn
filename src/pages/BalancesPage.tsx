@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   Divider,
   List,
@@ -14,7 +15,7 @@ import { useApp } from '../hooks/useApp';
 import { useBalances } from '../hooks/useBalances';
 
 export default function BalancesPage() {
-  const { markAllAsPaid } = useApp();
+  const { markAllAsPaid, loading } = useApp();
   const { balances, totalOwed } = useBalances();
 
   const hasUnpaidBalances = totalOwed > 0;
@@ -24,6 +25,14 @@ export default function BalancesPage() {
       await markAllAsPaid();
     }
   };
+
+  if (loading) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>

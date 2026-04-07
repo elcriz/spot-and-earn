@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import {
   Box,
   Chip,
+  CircularProgress,
   Container,
   List,
   ListItem,
@@ -13,7 +14,7 @@ import { useApp } from '../hooks/useApp';
 import { ANIMAL_EMOJIS, ANIMAL_LABELS } from '../models/types';
 
 export default function HistoryPage() {
-  const { sightings } = useApp();
+  const { sightings, loading } = useApp();
 
   // Sort sightings by timestamp, most recent first
   const sortedSightings = useMemo(() => {
@@ -57,6 +58,14 @@ export default function HistoryPage() {
       minute: '2-digit',
     });
   };
+
+  if (loading) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>

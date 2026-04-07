@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   Dialog,
   DialogActions,
@@ -22,7 +23,7 @@ import { useApp } from '../hooks/useApp';
 import { Child } from '../models/types';
 
 export default function SettingsPage() {
-  const { children, addChild, removeChild, updateChild } = useApp();
+  const { children, addChild, removeChild, updateChild, loading } = useApp();
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [newChildName, setNewChildName] = useState('');
@@ -61,6 +62,14 @@ export default function SettingsPage() {
     setEditName(child.name);
     setEditDialogOpen(true);
   };
+
+  if (loading) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>

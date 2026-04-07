@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   Container,
   Paper,
   Snackbar,
@@ -13,7 +14,7 @@ import { useApp } from '../hooks/useApp';
 import { AnimalType, ANIMAL_EMOJIS, ANIMAL_LABELS, ANIMAL_VALUES } from '../models/types';
 
 export default function HomePage() {
-  const { children, addSighting, undoLastSighting, toggleChildActive, lastSightingIds } = useApp();
+  const { children, addSighting, undoLastSighting, toggleChildActive, lastSightingIds, loading } = useApp();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -37,6 +38,14 @@ export default function HomePage() {
     await undoLastSighting();
     setSnackbarOpen(false);
   };
+
+  if (loading) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+        <CircularProgress />
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
