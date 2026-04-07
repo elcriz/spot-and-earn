@@ -117,7 +117,7 @@ export default function HistoryPage() {
           </Paper>
         ) : (
           <>
-            <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50' }}>
+            <Paper elevation={1} sx={{ p: 2, bgcolor: 'action.hover' }}>
               <Typography variant="body2" color="text.secondary" align="center">
                 {sortedHistory.length} total {sortedHistory.length !== 1 ? 'entries' : 'entry'}
               </Typography>
@@ -221,7 +221,8 @@ export default function HistoryPage() {
                           py: 2,
                           flexDirection: 'column',
                           alignItems: 'flex-start',
-                          bgcolor: 'success.lighter',
+                          bgcolor: (theme) => theme.palette.mode === 'dark' ? 'success.dark' : 'success.light',
+                          backgroundImage: (theme) => theme.palette.mode === 'dark' ? 'none' : undefined,
                         }}
                       >
                         <Box
@@ -301,7 +302,7 @@ export default function HistoryPage() {
           <DialogContentText>
             Are you sure you want to delete this sighting? This will adjust the balance and cannot be undone.
             {sightingToDelete && (
-              <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.100', borderRadius: 1 }}>
+              <Box sx={{ mt: 2, p: 2, bgcolor: 'action.hover', borderRadius: 1 }}>
                 <Typography variant="body2">
                   <strong>{ANIMAL_EMOJIS[sightingToDelete.animal]} {ANIMAL_LABELS[sightingToDelete.animal]}</strong> - €{sightingToDelete.value.toFixed(2)}
                 </Typography>

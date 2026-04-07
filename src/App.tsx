@@ -1,5 +1,6 @@
+import { useMemo } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { CssBaseline, ThemeProvider, createTheme, useMediaQuery } from '@mui/material';
 import { AppProvider } from './hooks/useApp';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
@@ -7,47 +8,60 @@ import BalancesPage from './pages/BalancesPage';
 import HistoryPage from './pages/HistoryPage';
 import SettingsPage from './pages/SettingsPage';
 
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#ff9800',
-    },
-  },
-  typography: {
-    fontFamily: [
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
-      'Roboto',
-      '"Helvetica Neue"',
-      'Arial',
-      'sans-serif',
-    ].join(','),
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none',
-          borderRadius: 8,
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-        },
-      },
-    },
-  },
-});
-
 function App() {
+  // Detect user's preferred color scheme
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode: prefersDarkMode ? 'dark' : 'light',
+          primary: {
+            main: '#1976d2',
+          },
+          secondary: {
+            main: '#ff9800',
+          },
+          ...(prefersDarkMode && {
+            background: {
+              default: '#121212',
+              paper: '#1e1e1e',
+            },
+          }),
+        },
+        typography: {
+          fontFamily: [
+            '-apple-system',
+            'BlinkMacSystemFont',
+            '"Segoe UI"',
+            'Roboto',
+            '"Helvetica Neue"',
+            'Arial',
+            'sans-serif',
+          ].join(','),
+        },
+        components: {
+          MuiButton: {
+            styleOverrides: {
+              root: {
+                textTransform: 'none',
+                borderRadius: 8,
+              },
+            },
+          },
+          MuiPaper: {
+            styleOverrides: {
+              root: {
+                borderRadius: 12,
+              },
+            },
+          },
+        },
+      }),
+    [prefersDarkMode]
+  );
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />

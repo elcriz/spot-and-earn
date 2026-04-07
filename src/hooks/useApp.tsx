@@ -119,14 +119,14 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
 
   const markAllAsPaid = async () => {
     const unpaidSightings = sightings.filter(s => !s.paid);
-    
+
     if (unpaidSightings.length === 0) {
       return;
     }
 
     // Calculate balances per child
     const childBalancesMap = new Map<string, { childName: string; amount: number }>();
-    
+
     unpaidSightings.forEach(sighting => {
       sighting.childIds.forEach((childId, idx) => {
         const childName = sighting.childNamesSnapshot[idx];
@@ -154,13 +154,13 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
 
     // Update sightings to paid
     const updatedSightings = sightings.map(s => ({ ...s, paid: true }));
-    
+
     // Save to database
     await Promise.all([
       db.saveSightings(updatedSightings),
       db.savePaymentRecord(paymentRecord),
     ]);
-    
+
     setSightings(updatedSightings);
     setPaymentRecords(prev => [...prev, paymentRecord]);
     setLastSightingIds([]);

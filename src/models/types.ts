@@ -28,7 +28,7 @@ export type PaymentRecord = {
   }>;
 };
 
-export type HistoryEntry = 
+export type HistoryEntry =
   | { type: 'sighting'; data: Sighting }
   | { type: 'payment'; data: PaymentRecord };
 
