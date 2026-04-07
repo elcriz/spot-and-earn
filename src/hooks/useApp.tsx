@@ -11,6 +11,7 @@ interface AppContextType {
   updateChild: (child: Child) => Promise<void>;
   toggleChildActive: (id: string) => Promise<void>;
   addSighting: (animal: AnimalType) => Promise<Sighting[]>;
+  deleteSighting: (id: string) => Promise<void>;
   undoLastSighting: () => Promise<void>;
   markAllAsPaid: () => Promise<void>;
   lastSightingIds: string[];
@@ -96,6 +97,13 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
     return newSightings;
   };
 
+  const deleteSighting = async (id: string) => {
+    await db.deleteSighting(id);
+    setSightings(prev => prev.filter(s => s.id !== id));
+    // Clear lastSightingIds if the deleted sighting is in it
+    setLastSightingIds(prev => prev.filter(sId => sId !== id));
+  };
+
   const undoLastSighting = async () => {
     if (lastSightingIds.length === 0) return;
 
@@ -123,6 +131,7 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
         updateChild,
         toggleChildActive,
         addSighting,
+        deleteSighting,
         undoLastSighting,
         markAllAsPaid,
         lastSightingIds,
