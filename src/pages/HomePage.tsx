@@ -50,67 +50,66 @@ export default function HomePage() {
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
       <Stack spacing={3}>
-        {/* Animal Buttons */}
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom align="center">
-            Spot an animal
-          </Typography>
-          <Stack spacing={2}>
-            <Button
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={!hasActiveChildren}
-              onClick={() => handleAnimalClick('deer')}
-              sx={{
-                fontSize: '1.5rem',
-                py: 3,
-                background: hasActiveChildren
-                  ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                  : undefined,
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.deer}</span>
-                <Box sx={{ textAlign: 'left' }}>
-                  <Typography variant="h5" component="div">
-                    {ANIMAL_LABELS.deer}
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    +€{ANIMAL_VALUES.deer.toFixed(2)}
-                  </Typography>
-                </Box>
-              </Box>
-            </Button>
+        <Typography variant="h5" align="center">
+          Spot &amp; Earn
+        </Typography>
 
-            <Button
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={!hasActiveChildren}
-              onClick={() => handleAnimalClick('hare')}
-              sx={{
-                fontSize: '1.5rem',
-                py: 3,
-                background: hasActiveChildren
-                  ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-                  : undefined,
-              }}
-            >
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.hare}</span>
-                <Box sx={{ textAlign: 'left' }}>
-                  <Typography variant="h5" component="div">
-                    {ANIMAL_LABELS.hare}
-                  </Typography>
-                  <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                    +€{ANIMAL_VALUES.hare.toFixed(2)}
-                  </Typography>
-                </Box>
+        {/* Animal Buttons */}
+        <Stack spacing={2}>
+          <Button
+            variant="contained"
+            size="large"
+            fullWidth
+            disabled={!hasActiveChildren}
+            onClick={() => handleAnimalClick('deer')}
+            sx={{
+              fontSize: '1.5rem',
+              py: 3,
+              background: hasActiveChildren
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                : undefined,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.deer}</span>
+              <Box sx={{ textAlign: 'left' }}>
+                <Typography variant="h5" component="div">
+                  {ANIMAL_LABELS.deer}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  +€{ANIMAL_VALUES.deer.toFixed(2)}
+                </Typography>
               </Box>
-            </Button>
-          </Stack>
-        </Paper>
+            </Box>
+          </Button>
+
+          <Button
+            variant="contained"
+            size="large"
+            fullWidth
+            disabled={!hasActiveChildren}
+            onClick={() => handleAnimalClick('hare')}
+            sx={{
+              fontSize: '1.5rem',
+              py: 3,
+              background: hasActiveChildren
+                ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                : undefined,
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.hare}</span>
+              <Box sx={{ textAlign: 'left' }}>
+                <Typography variant="h5" component="div">
+                  {ANIMAL_LABELS.hare}
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  +€{ANIMAL_VALUES.hare.toFixed(2)}
+                </Typography>
+              </Box>
+            </Box>
+          </Button>
+        </Stack>
 
         {/* Kids currently with me */}
         <Paper elevation={2} sx={{ p: 3 }}>
@@ -122,7 +121,7 @@ export default function HomePage() {
               No children added yet. Go to Settings to add children.
             </Typography>
           ) : (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
               {children.map(child => (
                 <Chip
                   key={child.id}

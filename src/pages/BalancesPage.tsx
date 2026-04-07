@@ -37,10 +37,10 @@ export default function BalancesPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
       <Stack spacing={3}>
+        <Typography variant="h5" gutterBottom align="center">
+          Current Balances
+        </Typography>
         <Paper elevation={2} sx={{ p: 3 }}>
-          <Typography variant="h5" gutterBottom align="center">
-            Current Balances
-          </Typography>
 
           {balances.length === 0 ? (
             <Typography variant="body2" color="text.secondary">
