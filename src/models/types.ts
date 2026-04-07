@@ -27,6 +27,6 @@ export const ANIMAL_EMOJIS: Record<AnimalType, string> = {
 };
 
 export const ANIMAL_LABELS: Record<AnimalType, string> = {
-  deer: 'Deer',
-  hare: 'Hare',
+  deer: 'Roe deer',
+  hare: 'European hare',
 };
