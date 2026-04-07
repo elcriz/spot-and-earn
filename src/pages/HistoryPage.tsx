@@ -100,6 +100,14 @@ export default function HistoryPage() {
       <Stack spacing={3}>
         <Typography variant="h5">Sighting History</Typography>
 
+        {sortedSightings.length > 0 && (
+          <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50' }}>
+            <Typography variant="body2" color="text.secondary" align="center">
+              {sortedSightings.length} total sighting{sortedSightings.length !== 1 ? 's' : ''}
+            </Typography>
+          </Paper>
+        )}
+
         {sortedSightings.length === 0 ? (
           <Paper elevation={2} sx={{ p: 4, textAlign: 'center' }}>
             <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -199,14 +207,6 @@ export default function HistoryPage() {
                 </ListItem>
               ))}
             </List>
-          </Paper>
-        )}
-
-        {sortedSightings.length > 0 && (
-          <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50' }}>
-            <Typography variant="body2" color="text.secondary" align="center">
-              {sortedSightings.length} total sighting{sortedSightings.length !== 1 ? 's' : ''}
-            </Typography>
           </Paper>
         )}
       </Stack>
