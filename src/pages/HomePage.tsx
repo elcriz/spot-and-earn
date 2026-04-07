@@ -52,7 +52,7 @@ export default function HomePage() {
       <Stack spacing={3}>
         {/* Animal Buttons */}
         <Paper elevation={2} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom align="center">
             Spot an animal
           </Typography>
           <Stack spacing={2}>
@@ -114,7 +114,7 @@ export default function HomePage() {
 
         {/* Kids currently with me */}
         <Paper elevation={2} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" gutterBottom align="center">
             Kids currently with me
           </Typography>
           {children.length === 0 ? (

@@ -74,7 +74,7 @@ export default function SettingsPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
       <Stack spacing={3}>
-        <Typography variant="h5">Settings</Typography>
+        <Typography variant="h5" align="center">Settings</Typography>
 
         <Paper elevation={2} sx={{ p: 3 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

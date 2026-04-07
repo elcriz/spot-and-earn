@@ -98,7 +98,7 @@ export default function HistoryPage() {
   return (
     <Container maxWidth="sm" sx={{ py: 3 }}>
       <Stack spacing={3}>
-        <Typography variant="h5">Sighting History</Typography>
+        <Typography variant="h5" align="center">Sighting History</Typography>
 
         {sortedSightings.length > 0 && (
           <Paper elevation={1} sx={{ p: 2, bgcolor: 'grey.50' }}>
