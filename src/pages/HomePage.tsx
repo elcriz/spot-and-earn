@@ -21,7 +21,7 @@ export default function HomePage() {
   const [tapCount, setTapCount] = useState(0);
   const [accumulatedTotal, setAccumulatedTotal] = useState(0);
   const [showTapAnimation, setShowTapAnimation] = useState(false);
-  
+
   const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const accumulatedChildNamesRef = useRef<string[]>([]);
 
@@ -31,8 +31,6 @@ export default function HomePage() {
   // Reset tap count and show snackbar after inactivity
   useEffect(() => {
     if (tapCount > 0) {
-      setShowTapAnimation(true);
-      
       if (tapTimeoutRef.current) {
         clearTimeout(tapTimeoutRef.current);
       }
@@ -44,7 +42,7 @@ export default function HomePage() {
           setSnackbarMessage(`+€${accumulatedTotal.toFixed(2)} (${uniqueNames.join(', ')})`);
           setSnackbarOpen(true);
         }
-        
+
         // Reset everything
         setTapCount(0);
         setAccumulatedTotal(0);
@@ -63,14 +61,17 @@ export default function HomePage() {
   const handleAnimalClick = async (animal: AnimalType) => {
     if (!hasActiveChildren) return;
 
+    // Increment tap count immediately for visual feedback
+    setTapCount(prev => prev + 1);
+    setShowTapAnimation(true);
+
     const sightings = await addSighting(animal);
 
     if (sightings.length > 0) {
       const totalAdded = sightings.reduce((sum, s) => sum + s.value, 0);
       const childNames = sightings.map(s => s.childNamesSnapshot[0]);
-      
+
       // Accumulate values
-      setTapCount(prev => prev + 1);
       setAccumulatedTotal(prev => prev + totalAdded);
       accumulatedChildNamesRef.current.push(...childNames);
     }
@@ -115,6 +116,7 @@ export default function HomePage() {
         {/* Tap Counter Animation */}
         {showTapAnimation && tapCount > 0 && (
           <Box
+            key={tapCount}
             sx={{
               position: 'fixed',
               top: '50%',
