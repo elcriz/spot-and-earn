@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import {
-  Box,
   Button,
   Chip,
   CircularProgress,
@@ -9,61 +8,31 @@ import {
   Snackbar,
   Stack,
   Typography,
+  Box,
 } from '@mui/material';
 import { useApp } from '../hooks/useApp';
 import { AnimalType } from '../models/types';
 import AnimalButton from '../components/AnimalButton';
+import TapCounter, { TapCounterRef } from '../components/TapCounter';
 
 export default function HomePage() {
   const { children, addSighting, undoLastSighting, toggleChildActive, lastSightingIds, loading } = useApp();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [tapCount, setTapCount] = useState(0);
-  const [accumulatedTotal, setAccumulatedTotal] = useState(0);
-  const [showTapAnimation, setShowTapAnimation] = useState(false);
 
-  const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const accumulatedChildNamesRef = useRef<string[]>([]);
+  const tapCounterRef = useRef<TapCounterRef>(null);
 
   const activeChildren = children.filter(c => c.active);
   const hasActiveChildren = activeChildren.length > 0;
 
-  // Reset tap count and show snackbar after inactivity
-  useEffect(() => {
-    if (tapCount > 0) {
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-      }
-
-      tapTimeoutRef.current = setTimeout(() => {
-        // Show final snackbar with accumulated total
-        if (accumulatedTotal > 0 && accumulatedChildNamesRef.current.length > 0) {
-          const uniqueNames = [...new Set(accumulatedChildNamesRef.current)];
-          setSnackbarMessage(`+€${accumulatedTotal.toFixed(2)} (${uniqueNames.join(', ')})`);
-          setSnackbarOpen(true);
-        }
-
-        // Reset everything
-        setTapCount(0);
-        setAccumulatedTotal(0);
-        setShowTapAnimation(false);
-        accumulatedChildNamesRef.current = [];
-      }, 500);
-    }
-
-    return () => {
-      if (tapTimeoutRef.current) {
-        clearTimeout(tapTimeoutRef.current);
-      }
-    };
-  }, [tapCount, accumulatedTotal]);
+  const handleTapComplete = (total: number, childNames: string[]) => {
+    const uniqueNames = [...new Set(childNames)];
+    setSnackbarMessage(`+€${total.toFixed(2)} (${uniqueNames.join(', ')})`);
+    setSnackbarOpen(true);
+  };
 
   const handleAnimalClick = async (animal: AnimalType) => {
     if (!hasActiveChildren) return;
-
-    // Increment tap count immediately for visual feedback
-    setTapCount(prev => prev + 1);
-    setShowTapAnimation(true);
 
     const sightings = await addSighting(animal);
 
@@ -71,9 +40,8 @@ export default function HomePage() {
       const totalAdded = sightings.reduce((sum, s) => sum + s.value, 0);
       const childNames = sightings.map(s => s.childNamesSnapshot[0]);
 
-      // Accumulate values
-      setAccumulatedTotal(prev => prev + totalAdded);
-      accumulatedChildNamesRef.current.push(...childNames);
+      // Increment tap counter
+      tapCounterRef.current?.incrementTap(totalAdded, childNames);
     }
   };
 
@@ -114,46 +82,7 @@ export default function HomePage() {
         </Stack>
 
         {/* Tap Counter Animation */}
-        {showTapAnimation && tapCount > 0 && (
-          <Box
-            key={tapCount}
-            sx={{
-              position: 'fixed',
-              top: '50%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 9999,
-              pointerEvents: 'none',
-            }}
-          >
-            <Typography
-              variant="h1"
-              sx={{
-                fontSize: '8rem',
-                fontWeight: 'bold',
-                color: (theme) => theme.palette.primary.main,
-                textShadow: '0 0 20px rgba(0,0,0,0.3)',
-                animation: 'tapPulse 0.3s ease-out',
-                '@keyframes tapPulse': {
-                  '0%': {
-                    transform: 'scale(0.5)',
-                    opacity: 0,
-                  },
-                  '50%': {
-                    transform: 'scale(1.2)',
-                    opacity: 1,
-                  },
-                  '100%': {
-                    transform: 'scale(1)',
-                    opacity: 0.9,
-                  },
-                },
-              }}
-            >
-              {tapCount}
-            </Typography>
-          </Box>
-        )}
+        <TapCounter ref={tapCounterRef} onComplete={handleTapComplete} />
 
         {/* Kids currently with me */}
         <Paper elevation={2} sx={{ p: 3 }}>
