@@ -10,7 +10,7 @@ import {
   Box,
 } from '@mui/material';
 import { useApp } from '../hooks/useApp';
-import { AnimalType } from '../models/types';
+import { AnimalType, ANIMAL_VALUES } from '../models/types';
 import AnimalButton from '../components/AnimalButton';
 import TapCounter, { TapCounterRef } from '../components/TapCounter';
 import Loader from '../components/Loader';
@@ -36,14 +36,16 @@ export default function HomePage() {
       return;
     }
 
-    const sightings = await addSighting(animal);
+    // Calculate expected values immediately for instant feedback
+    const animalValue = ANIMAL_VALUES[animal];
+    const expectedTotal = animalValue * activeChildren.length;
+    const expectedChildNames = activeChildren.map(c => c.name);
 
-    if (sightings.length > 0) {
-      const totalAdded = sightings.reduce((sum, s) => sum + s.value, 0);
-      const childNames = sightings.map(s => s.childNamesSnapshot[0]);
+    // Increment tap counter IMMEDIATELY before async operation
+    tapCounterRef.current?.incrementTap(expectedTotal, expectedChildNames);
 
-      tapCounterRef.current?.incrementTap(totalAdded, childNames);
-    }
+    // Then proceed with async sighting addition
+    await addSighting(animal);
   };
 
   const handleUndo = async () => {
