@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   Box,
   Button,
@@ -18,9 +18,47 @@ export default function HomePage() {
   const { children, addSighting, undoLastSighting, toggleChildActive, lastSightingIds, loading } = useApp();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [tapCount, setTapCount] = useState(0);
+  const [accumulatedTotal, setAccumulatedTotal] = useState(0);
+  const [showTapAnimation, setShowTapAnimation] = useState(false);
+  
+  const tapTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const accumulatedChildNamesRef = useRef<string[]>([]);
 
   const activeChildren = children.filter(c => c.active);
   const hasActiveChildren = activeChildren.length > 0;
+
+  // Reset tap count and show snackbar after inactivity
+  useEffect(() => {
+    if (tapCount > 0) {
+      setShowTapAnimation(true);
+      
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+
+      tapTimeoutRef.current = setTimeout(() => {
+        // Show final snackbar with accumulated total
+        if (accumulatedTotal > 0 && accumulatedChildNamesRef.current.length > 0) {
+          const uniqueNames = [...new Set(accumulatedChildNamesRef.current)];
+          setSnackbarMessage(`+€${accumulatedTotal.toFixed(2)} (${uniqueNames.join(', ')})`);
+          setSnackbarOpen(true);
+        }
+        
+        // Reset everything
+        setTapCount(0);
+        setAccumulatedTotal(0);
+        setShowTapAnimation(false);
+        accumulatedChildNamesRef.current = [];
+      }, 500);
+    }
+
+    return () => {
+      if (tapTimeoutRef.current) {
+        clearTimeout(tapTimeoutRef.current);
+      }
+    };
+  }, [tapCount, accumulatedTotal]);
 
   const handleAnimalClick = async (animal: AnimalType) => {
     if (!hasActiveChildren) return;
@@ -29,9 +67,12 @@ export default function HomePage() {
 
     if (sightings.length > 0) {
       const totalAdded = sightings.reduce((sum, s) => sum + s.value, 0);
-      const childNames = sightings.map(s => s.childNamesSnapshot[0]).join(', ');
-      setSnackbarMessage(`+€${totalAdded.toFixed(2)} (${childNames})`);
-      setSnackbarOpen(true);
+      const childNames = sightings.map(s => s.childNamesSnapshot[0]);
+      
+      // Accumulate values
+      setTapCount(prev => prev + 1);
+      setAccumulatedTotal(prev => prev + totalAdded);
+      accumulatedChildNamesRef.current.push(...childNames);
     }
   };
 
@@ -70,6 +111,47 @@ export default function HomePage() {
             onAnimalClick={handleAnimalClick}
           />
         </Stack>
+
+        {/* Tap Counter Animation */}
+        {showTapAnimation && tapCount > 0 && (
+          <Box
+            sx={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              zIndex: 9999,
+              pointerEvents: 'none',
+            }}
+          >
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: '8rem',
+                fontWeight: 'bold',
+                color: (theme) => theme.palette.primary.main,
+                textShadow: '0 0 20px rgba(0,0,0,0.3)',
+                animation: 'tapPulse 0.3s ease-out',
+                '@keyframes tapPulse': {
+                  '0%': {
+                    transform: 'scale(0.5)',
+                    opacity: 0,
+                  },
+                  '50%': {
+                    transform: 'scale(1.2)',
+                    opacity: 1,
+                  },
+                  '100%': {
+                    transform: 'scale(1)',
+                    opacity: 0.9,
+                  },
+                },
+              }}
+            >
+              {tapCount}
+            </Typography>
+          </Box>
+        )}
 
         {/* Kids currently with me */}
         <Paper elevation={2} sx={{ p: 3 }}>
