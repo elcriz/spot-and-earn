@@ -11,7 +11,8 @@ import {
   Typography,
 } from '@mui/material';
 import { useApp } from '../hooks/useApp';
-import { AnimalType, ANIMAL_EMOJIS, ANIMAL_LABELS, ANIMAL_VALUES } from '../models/types';
+import { AnimalType } from '../models/types';
+import AnimalButton from '../components/AnimalButton';
 
 export default function HomePage() {
   const { children, addSighting, undoLastSighting, toggleChildActive, lastSightingIds, loading } = useApp();
@@ -56,61 +57,18 @@ export default function HomePage() {
 
         {/* Animal Buttons */}
         <Stack spacing={2}>
-          <Button
-            variant="contained"
-            size="large"
-            fullWidth
+          <AnimalButton
+            animal="deer"
             disabled={!hasActiveChildren}
-            onClick={() => handleAnimalClick('deer')}
-            sx={{
-              fontSize: '1.5rem',
-              py: 3,
-              justifyContent: 'flex-start',
-              background: hasActiveChildren
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                : undefined,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 2 }}>
-              <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.deer}</span>
-              <Box sx={{ textAlign: 'left' }}>
-                <Typography variant="h5" component="div">
-                  {ANIMAL_LABELS.deer}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  +€{ANIMAL_VALUES.deer.toFixed(2)}
-                </Typography>
-              </Box>
-            </Box>
-          </Button>
-
-          <Button
-            variant="contained"
-            size="large"
-            fullWidth
+            gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+            onAnimalClick={handleAnimalClick}
+          />
+          <AnimalButton
+            animal="hare"
             disabled={!hasActiveChildren}
-            onClick={() => handleAnimalClick('hare')}
-            sx={{
-              fontSize: '1.5rem',
-              py: 3,
-              justifyContent: 'flex-start',
-              background: hasActiveChildren
-                ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
-                : undefined,
-            }}
-          >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 2 }}>
-              <span style={{ fontSize: '3rem' }}>{ANIMAL_EMOJIS.hare}</span>
-              <Box sx={{ textAlign: 'left' }}>
-                <Typography variant="h5" component="div">
-                  {ANIMAL_LABELS.hare}
-                </Typography>
-                <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  +€{ANIMAL_VALUES.hare.toFixed(2)}
-                </Typography>
-              </Box>
-            </Box>
-          </Button>
+            gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+            onAnimalClick={handleAnimalClick}
+          />
         </Stack>
 
         {/* Kids currently with me */}
