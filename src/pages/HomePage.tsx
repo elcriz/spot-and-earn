@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
   Box,
+  useTheme,
 } from '@mui/material';
 import { useApp } from '../hooks/useApp';
 import { AnimalType, ANIMAL_VALUES } from '../models/types';
@@ -16,6 +17,7 @@ import TapCounter, { TapCounterRef } from '../components/TapCounter';
 import Loader from '../components/Loader';
 
 export default function HomePage() {
+  const theme = useTheme();
   const { children, addSighting, undoLastSighting, toggleChildActive, lastSightingIds, loading } = useApp();
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -120,6 +122,22 @@ export default function HomePage() {
             </Typography>
           </Paper>
         )}
+
+        {/* Background Image */}
+        <Box
+          component="img"
+          src={theme.palette.mode === 'dark' 
+            ? '/spot-and-earn/background-image-001-dark.png' 
+            : '/spot-and-earn/background-image-001-light.png'
+          }
+          alt="Nature background"
+          sx={{
+            width: '100%',
+            height: 'auto',
+            borderRadius: 2,
+            display: 'block',
+          }}
+        />
       </Stack>
 
       {/* Snackbar */}
