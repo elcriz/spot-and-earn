@@ -64,16 +64,25 @@ export default function HomePage() {
     : '/spot-and-earn/background-image-001-light.png';
 
   return (
-    <Box
-      sx={{
-        position: 'relative',
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: 'contain',
-        backgroundPosition: 'center bottom',
-        backgroundRepeat: 'no-repeat',
-        paddingBottom: '80px', // Space above bottom navigation
-      }}
-    >
+    <>
+      {/* Fixed Background Image */}
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: '56px', // Height of bottom navigation
+          left: 0,
+          right: 0,
+          height: '100vh',
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'contain',
+          backgroundPosition: 'center bottom',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 0,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* Content */}
       <Container maxWidth="sm" sx={{ py: 3, position: 'relative', zIndex: 1 }}>
         <Stack spacing={3}>
           <Typography variant="h5" align="center">
@@ -155,6 +164,6 @@ export default function HomePage() {
           sx={{ mb: 8 }}
         />
       </Container>
-    </Box>
+    </>
   );
 }
