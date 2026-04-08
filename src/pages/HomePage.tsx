@@ -59,14 +59,14 @@ export default function HomePage() {
     return <Loader />;
   }
 
-  const backgroundImage = theme.palette.mode === 'dark' 
-    ? '/spot-and-earn/background-image-001-dark.png' 
+  const backgroundImage = theme.palette.mode === 'dark'
+    ? '/spot-and-earn/background-image-001-dark.png'
     : '/spot-and-earn/background-image-001-light.png';
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
+        position: 'relative',
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'contain',
         backgroundPosition: 'center bottom',
