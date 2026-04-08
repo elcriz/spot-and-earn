@@ -145,7 +145,7 @@ export default function HomePage() {
 
         {!hasActiveChildren && children.length > 0 && (
           <Paper elevation={1} sx={{ p: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'info.dark' : 'info.light' }}>
-            <Typography variant="body2" color="info.dark">
+            <Typography variant="body2" sx={{ color: (theme) => theme.palette.mode === 'dark' ? 'info.light' : 'info.dark' }}>
               💡 Select at least one child to start tracking sightings
             </Typography>
           </Paper>
