@@ -108,6 +108,17 @@ export async function deletePaymentRecord(id: string): Promise<void> {
   await db.delete('payments', id);
 }
 
+// Delete all history (sightings and payments)
+export async function deleteAllHistory(): Promise<void> {
+  const db = await getDB();
+  const tx = db.transaction(['sightings', 'payments'], 'readwrite');
+  await Promise.all([
+    tx.objectStore('sightings').clear(),
+    tx.objectStore('payments').clear(),
+    tx.done,
+  ]);
+}
+
 // Initialize database with default children
 export async function initializeDefaultData(): Promise<void> {
   const db = await getDB();

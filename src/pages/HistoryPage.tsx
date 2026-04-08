@@ -26,8 +26,9 @@ import { ANIMAL_EMOJIS, ANIMAL_LABELS, Sighting, HistoryEntry } from '../models/
 import { getMapUrl } from '../services/geolocation';
 
 export default function HistoryPage() {
-  const { sightings, paymentRecords, deleteSighting, loading } = useApp();
+  const { sightings, paymentRecords, deleteSighting, deleteAllHistory, loading } = useApp();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteAllDialogOpen, setDeleteAllDialogOpen] = useState(false);
   const [sightingToDelete, setSightingToDelete] = useState<Sighting | null>(null);
 
   // Merge and sort all history entries by timestamp, most recent first
@@ -95,6 +96,19 @@ export default function HistoryPage() {
     setSightingToDelete(null);
   };
 
+  const handleDeleteAllClick = () => {
+    setDeleteAllDialogOpen(true);
+  };
+
+  const handleDeleteAllConfirm = async () => {
+    await deleteAllHistory();
+    setDeleteAllDialogOpen(false);
+  };
+
+  const handleDeleteAllCancel = () => {
+    setDeleteAllDialogOpen(false);
+  };
+
   if (loading) {
     return (
       <Container maxWidth="sm" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
@@ -120,9 +134,20 @@ export default function HistoryPage() {
         ) : (
           <>
             <Paper elevation={1} sx={{ p: 2, bgcolor: 'action.hover' }}>
-              <Typography variant="body2" color="text.secondary" align="center">
-                {sortedHistory.length} total {sortedHistory.length !== 1 ? 'entries' : 'entry'}
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  {sortedHistory.length} total {sortedHistory.length !== 1 ? 'entries' : 'entry'}
+                </Typography>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  size="small"
+                  startIcon={<DeleteIcon />}
+                  onClick={handleDeleteAllClick}
+                >
+                  Delete All
+                </Button>
+              </Box>
             </Paper>
 
             <Paper elevation={2}>
@@ -331,6 +356,22 @@ export default function HistoryPage() {
           <Button onClick={handleDeleteCancel}>Cancel</Button>
           <Button onClick={handleDeleteConfirm} color="error" variant="contained">
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete All History Confirmation Dialog */}
+      <Dialog open={deleteAllDialogOpen} onClose={handleDeleteAllCancel}>
+        <DialogTitle>Delete All History?</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete <strong>all history</strong>? This will permanently remove all {sortedHistory.length} {sortedHistory.length !== 1 ? 'entries' : 'entry'} (sightings and payments) and cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteAllCancel}>Cancel</Button>
+          <Button onClick={handleDeleteAllConfirm} color="error" variant="contained">
+            Delete All
           </Button>
         </DialogActions>
       </Dialog>

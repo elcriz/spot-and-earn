@@ -16,6 +16,7 @@ interface AppContextType {
   deleteSighting: (id: string) => Promise<void>;
   undoLastSighting: () => Promise<void>;
   markAllAsPaid: () => Promise<void>;
+  deleteAllHistory: () => Promise<void>;
   lastSightingIds: string[];
 }
 
@@ -171,6 +172,13 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
     setLastSightingIds([]);
   };
 
+  const deleteAllHistory = async () => {
+    await db.deleteAllHistory();
+    setSightings([]);
+    setPaymentRecords([]);
+    setLastSightingIds([]);
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -186,6 +194,7 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
         deleteSighting,
         undoLastSighting,
         markAllAsPaid,
+        deleteAllHistory,
         lastSightingIds,
       }}
     >
