@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import {
   Button,
   Chip,
-  CircularProgress,
   Container,
   Paper,
   Snackbar,
@@ -14,6 +13,7 @@ import { useApp } from '../hooks/useApp';
 import { AnimalType } from '../models/types';
 import AnimalButton from '../components/AnimalButton';
 import TapCounter, { TapCounterRef } from '../components/TapCounter';
+import Loader from '../components/Loader';
 
 export default function HomePage() {
   const { children, addSighting, undoLastSighting, toggleChildActive, lastSightingIds, loading } = useApp();
@@ -32,7 +32,9 @@ export default function HomePage() {
   };
 
   const handleAnimalClick = async (animal: AnimalType) => {
-    if (!hasActiveChildren) return;
+    if (!hasActiveChildren) {
+      return;
+    }
 
     const sightings = await addSighting(animal);
 
@@ -40,7 +42,6 @@ export default function HomePage() {
       const totalAdded = sightings.reduce((sum, s) => sum + s.value, 0);
       const childNames = sightings.map(s => s.childNamesSnapshot[0]);
 
-      // Increment tap counter
       tapCounterRef.current?.incrementTap(totalAdded, childNames);
     }
   };
@@ -51,11 +52,7 @@ export default function HomePage() {
   };
 
   if (loading) {
-    return (
-      <Container maxWidth="sm" sx={{ py: 3, display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
-        <CircularProgress />
-      </Container>
-    );
+    return <Loader />;
   }
 
   return (
