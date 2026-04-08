@@ -10,38 +10,41 @@ interface AnimalButtonProps {
 }
 
 export default function AnimalButton({ animal, disabled, gradient, onAnimalClick }: AnimalButtonProps) {
-  const [loading, setLoading] = useState(false);
+  const [pendingClicks, setPendingClicks] = useState(0);
 
   const handleClick = async () => {
-    if (disabled || loading) return;
-    
-    setLoading(true);
+    if (disabled) return;
+
+    setPendingClicks(prev => prev + 1);
     try {
       await onAnimalClick(animal);
     } finally {
-      // Keep loading state for a brief moment to ensure visual feedback
-      setTimeout(() => setLoading(false), 300);
+      setTimeout(() => {
+        setPendingClicks(prev => Math.max(0, prev - 1));
+      }, 150);
     }
   };
+
+  const isLoading = pendingClicks > 0;
 
   return (
     <Button
       variant="contained"
       size="large"
       fullWidth
-      disabled={disabled || loading}
+      disabled={disabled}
       onClick={handleClick}
       sx={{
         fontSize: '1.5rem',
         py: 3,
         justifyContent: 'flex-start',
-        background: !disabled && !loading ? gradient : undefined,
+        background: !disabled && !isLoading ? gradient : undefined,
         position: 'relative',
       }}
     >
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', gap: 2 }}>
-        <span style={{ fontSize: '3rem', opacity: loading ? 0.5 : 1 }}>{ANIMAL_EMOJIS[animal]}</span>
-        <Box sx={{ textAlign: 'left', opacity: loading ? 0.5 : 1 }}>
+        <span style={{ fontSize: '3rem', opacity: isLoading ? 0.5 : 1 }}>{ANIMAL_EMOJIS[animal]}</span>
+        <Box sx={{ textAlign: 'left', opacity: isLoading ? 0.5 : 1 }}>
           <Typography variant="h5" component="div">
             {ANIMAL_LABELS[animal]}
           </Typography>
@@ -50,7 +53,7 @@ export default function AnimalButton({ animal, disabled, gradient, onAnimalClick
           </Typography>
         </Box>
       </Box>
-      {loading && (
+      {isLoading && (
         <CircularProgress
           size={24}
           sx={{
