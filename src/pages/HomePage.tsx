@@ -59,103 +59,102 @@ export default function HomePage() {
     return <Loader />;
   }
 
-  return (
-    <Container maxWidth="sm" sx={{ py: 3 }}>
-      <Stack spacing={3}>
-        <Typography variant="h5" align="center">
-          Spot &amp; Earn
-        </Typography>
+  const backgroundImage = theme.palette.mode === 'dark' 
+    ? '/spot-and-earn/background-image-001-dark.png' 
+    : '/spot-and-earn/background-image-001-light.png';
 
-        {/* Animal Buttons */}
-        <Stack spacing={2}>
-          <AnimalButton
-            animal="deer"
-            disabled={!hasActiveChildren}
-            gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-            onAnimalClick={handleAnimalClick}
-          />
-          <AnimalButton
-            animal="hare"
-            disabled={!hasActiveChildren}
-            gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
-            onAnimalClick={handleAnimalClick}
-          />
+  return (
+    <Box
+      sx={{
+        minHeight: '100vh',
+        backgroundImage: `url(${backgroundImage})`,
+        backgroundSize: 'contain',
+        backgroundPosition: 'center bottom',
+        backgroundRepeat: 'no-repeat',
+        paddingBottom: '80px', // Space above bottom navigation
+      }}
+    >
+      <Container maxWidth="sm" sx={{ py: 3, position: 'relative', zIndex: 1 }}>
+        <Stack spacing={3}>
+          <Typography variant="h5" align="center">
+            Spot &amp; Earn
+          </Typography>
+
+          {/* Animal Buttons */}
+          <Stack spacing={2}>
+            <AnimalButton
+              animal="deer"
+              disabled={!hasActiveChildren}
+              gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+              onAnimalClick={handleAnimalClick}
+            />
+            <AnimalButton
+              animal="hare"
+              disabled={!hasActiveChildren}
+              gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
+              onAnimalClick={handleAnimalClick}
+            />
+          </Stack>
+
+          {/* Tap Counter Animation */}
+          <TapCounter ref={tapCounterRef} onComplete={handleTapComplete} />
+
+          {/* Kids currently with me */}
+          <Paper elevation={2} sx={{ p: 3 }}>
+            <Typography variant="h6" gutterBottom align="center">
+              Kids currently with me
+            </Typography>
+            {children.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No children added yet. Go to Settings to add children.
+              </Typography>
+            ) : (
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                {children.map(child => (
+                  <Chip
+                    key={child.id}
+                    label={child.name}
+                    onClick={() => toggleChildActive(child.id)}
+                    color={child.active ? 'primary' : 'default'}
+                    variant={child.active ? 'filled' : 'outlined'}
+                    sx={{
+                      fontSize: '1rem',
+                      py: 2.5,
+                      px: 1,
+                      cursor: 'pointer',
+                    }}
+                  />
+                ))}
+              </Box>
+            )}
+          </Paper>
+
+          {!hasActiveChildren && children.length > 0 && (
+            <Paper elevation={1} sx={{ p: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'info.dark' : 'info.light' }}>
+              <Typography variant="body2" sx={{ color: (theme) => theme.palette.mode === 'dark' ? 'info.light' : 'info.dark' }}>
+                💡 Select at least one child to start tracking sightings
+              </Typography>
+            </Paper>
+          )}
         </Stack>
 
-        {/* Tap Counter Animation */}
-        <TapCounter ref={tapCounterRef} onComplete={handleTapComplete} />
-
-        {/* Kids currently with me */}
-        <Paper elevation={2} sx={{ p: 3 }}>
-          <Typography variant="h6" gutterBottom align="center">
-            Kids currently with me
-          </Typography>
-          {children.length === 0 ? (
-            <Typography variant="body2" color="text.secondary">
-              No children added yet. Go to Settings to add children.
-            </Typography>
-          ) : (
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
-              {children.map(child => (
-                <Chip
-                  key={child.id}
-                  label={child.name}
-                  onClick={() => toggleChildActive(child.id)}
-                  color={child.active ? 'primary' : 'default'}
-                  variant={child.active ? 'filled' : 'outlined'}
-                  sx={{
-                    fontSize: '1rem',
-                    py: 2.5,
-                    px: 1,
-                    cursor: 'pointer',
-                  }}
-                />
-              ))}
-            </Box>
-          )}
-        </Paper>
-
-        {!hasActiveChildren && children.length > 0 && (
-          <Paper elevation={1} sx={{ p: 2, bgcolor: (theme) => theme.palette.mode === 'dark' ? 'info.dark' : 'info.light' }}>
-            <Typography variant="body2" sx={{ color: (theme) => theme.palette.mode === 'dark' ? 'info.light' : 'info.dark' }}>
-              💡 Select at least one child to start tracking sightings
-            </Typography>
-          </Paper>
-        )}
-
-        {/* Background Image */}
-        <Box
-          component="img"
-          src={theme.palette.mode === 'dark' 
-            ? '/spot-and-earn/background-image-001-dark.png' 
-            : '/spot-and-earn/background-image-001-light.png'
+        {/* Snackbar */}
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+          message={snackbarMessage}
+          action={
+            lastSightingIds.length > 0 && (
+              <Button color="secondary" size="small" onClick={handleUndo}>
+                UNDO
+              </Button>
+            )
           }
-          alt="Nature background"
-          sx={{
-            width: '100%',
-            height: 'auto',
-            borderRadius: 2,
-            display: 'block',
-          }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          sx={{ mb: 8 }}
         />
-      </Stack>
-
-      {/* Snackbar */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={6000}
-        onClose={() => setSnackbarOpen(false)}
-        message={snackbarMessage}
-        action={
-          lastSightingIds.length > 0 && (
-            <Button color="secondary" size="small" onClick={handleUndo}>
-              UNDO
-            </Button>
-          )
-        }
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        sx={{ mb: 8 }}
-      />
-    </Container>
+      </Container>
+    </Box>
   );
 }
