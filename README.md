@@ -1,6 +1,6 @@
 # Spot & Earn
 
-A simple mobile-first web app to track animal sightings and reward kids with small earnings.
+A simple mobile-first web app to track animal sightings and reward kids with small earnings. Created using Claude Code and CodeRabbit.
 
 ## Why?
 
