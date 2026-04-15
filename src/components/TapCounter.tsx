@@ -11,7 +11,7 @@ export interface TapCounterRef {
 }
 
 const TapCounter = forwardRef<TapCounterRef, TapCounterProps>(
-  ({ onComplete, timeout = 500 }, ref) => {
+  ({ onComplete, timeout = 1000 }, ref) => {
     const [tapCount, setTapCount] = useState(0);
     const [accumulatedTotal, setAccumulatedTotal] = useState(0);
     const [showTapAnimation, setShowTapAnimation] = useState(false);
