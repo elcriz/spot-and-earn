@@ -1,1 +1,0 @@
-if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/spot-and-earn/sw.js', { scope: '/spot-and-earn/' })})}
