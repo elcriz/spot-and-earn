@@ -15,7 +15,7 @@ import { useApp } from '../hooks/useApp';
 import { useBalances } from '../hooks/useBalances';
 
 export default function BalancesPage() {
-  const { markAllAsPaid, loading } = useApp();
+  const { markAllAsPaid, markChildAsPaid, loading } = useApp();
   const { balances, totalOwed } = useBalances();
 
   const hasUnpaidBalances = totalOwed > 0;
@@ -23,6 +23,12 @@ export default function BalancesPage() {
   const handleMarkAllPaid = async () => {
     if (window.confirm('Mark all balances as paid? This cannot be undone.')) {
       await markAllAsPaid();
+    }
+  };
+
+  const handleMarkChildPaid = async (childId: string, childName: string) => {
+    if (window.confirm(`Mark ${childName}'s balance as paid? This cannot be undone.`)) {
+      await markChildAsPaid(childId);
     }
   };
 
@@ -58,21 +64,36 @@ export default function BalancesPage() {
                       borderBottom: '1px solid',
                       borderColor: 'divider',
                       '&:last-child': { borderBottom: 'none' },
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'stretch',
                     }}
                   >
-                    <ListItemText
-                      primary={child.name}
-                      primaryTypographyProps={{
-                        variant: 'h6',
-                      }}
-                    />
-                    <Typography
-                      variant="h6"
-                      color={balance > 0 ? 'primary' : 'text.secondary'}
-                      sx={{ fontWeight: 'bold' }}
-                    >
-                      €{balance.toFixed(2)}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: balance > 0 ? 1 : 0 }}>
+                      <ListItemText
+                        primary={child.name}
+                        primaryTypographyProps={{
+                          variant: 'h6',
+                        }}
+                      />
+                      <Typography
+                        variant="h6"
+                        color={balance > 0 ? 'primary' : 'text.secondary'}
+                        sx={{ fontWeight: 'bold' }}
+                      >
+                        €{balance.toFixed(2)}
+                      </Typography>
+                    </Box>
+                    {balance > 0 && (
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => handleMarkChildPaid(child.id, child.name)}
+                        sx={{ alignSelf: 'flex-end' }}
+                      >
+                        Mark as Paid
+                      </Button>
+                    )}
                   </ListItem>
                 ))}
               </List>

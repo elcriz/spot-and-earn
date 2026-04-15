@@ -16,6 +16,7 @@ interface AppContextType {
   deleteSighting: (id: string) => Promise<void>;
   undoLastSighting: () => Promise<void>;
   markAllAsPaid: () => Promise<void>;
+  markChildAsPaid: (childId: string) => Promise<void>;
   deleteAllHistory: () => Promise<void>;
   lastSightingIds: string[];
 }
@@ -172,6 +173,53 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
     setLastSightingIds([]);
   };
 
+  const markChildAsPaid = async (childId: string) => {
+    // Get unpaid sightings for this specific child
+    const childUnpaidSightings = sightings.filter(
+      s => !s.paid && s.childIds.includes(childId)
+    );
+
+    if (childUnpaidSightings.length === 0) {
+      return;
+    }
+
+    const child = children.find(c => c.id === childId);
+    if (!child) {
+      return;
+    }
+
+    const totalAmount = childUnpaidSightings.reduce((sum, s) => sum + s.value, 0);
+
+    // Create payment record for this child only
+    const paymentRecord: PaymentRecord = {
+      id: crypto.randomUUID(),
+      timestamp: Date.now(),
+      totalAmount,
+      sightingIds: childUnpaidSightings.map(s => s.id),
+      childBalances: [
+        {
+          childId,
+          childName: child.name,
+          amount: totalAmount,
+        },
+      ],
+    };
+
+    // Mark only this child's sightings as paid
+    const updatedSightings = sightings.map(s =>
+      childUnpaidSightings.some(cs => cs.id === s.id) ? { ...s, paid: true } : s
+    );
+
+    // Save to database
+    await Promise.all([
+      db.saveSightings(updatedSightings),
+      db.savePaymentRecord(paymentRecord),
+    ]);
+
+    setSightings(updatedSightings);
+    setPaymentRecords(prev => [...prev, paymentRecord]);
+  };
+
   const deleteAllHistory = async () => {
     await db.deleteAllHistory();
     setSightings([]);
@@ -194,6 +242,7 @@ export function AppProvider({ children: childrenProp }: { children: ReactNode })
         deleteSighting,
         undoLastSighting,
         markAllAsPaid,
+        markChildAsPaid,
         deleteAllHistory,
         lastSightingIds,
       }}
