@@ -21,6 +21,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
 import { useApp } from '../hooks/useApp';
 import { Child } from '../models/types';
+import packageJson from '../../package.json';
 
 export default function SettingsPage() {
   const { children, addChild, removeChild, updateChild, loading } = useApp();
@@ -138,6 +139,10 @@ export default function SettingsPage() {
             💡 Removing a child does not delete their sighting history
           </Typography>
         </Paper>
+
+        <Typography variant="caption" color="text.secondary" align="center" sx={{ pt: 2 }}>
+          Version {packageJson.version}
+        </Typography>
       </Stack>
 
       {/* Add Child Dialog */}
